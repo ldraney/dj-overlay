@@ -1,0 +1,7 @@
+{
+  "name": "dj-overlay",
+  "displayName": "DJ Overlay Controller",
+  "version": "0.1.0",
+  "description": "Controller for the distributed lofi system",
+  "entry": "index.html"
+}

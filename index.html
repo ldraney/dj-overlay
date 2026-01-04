@@ -3,796 +3,124 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lofi DJ Overlay</title>
-  <script src="https://unpkg.com/tone@14"></script>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      background: transparent;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      overflow: hidden;
-    }
-
-    #overlay {
-      width: 480px;
-      height: 100vh;
-      background: rgba(18, 18, 18, 0.95);
-      display: flex;
-      flex-direction: column;
-      padding: 24px;
-      gap: 20px;
-    }
-
-    #play-btn {
-      position: fixed;
-      top: 50%;
-      left: 240px;
-      transform: translate(-50%, -50%);
-      padding: 20px 40px;
-      font-size: 18px;
-      background: #fff;
-      color: #121212;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      z-index: 100;
-      font-weight: 600;
-    }
-
-    #play-btn:hover {
-      background: #e0e0e0;
-    }
-
-    #play-btn.hidden {
-      display: none;
-    }
-
-    .section {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 12px;
-      padding: 16px;
-    }
-
-    .title {
-      font-size: 28px;
-      font-weight: 700;
-      color: #fff;
-      letter-spacing: 2px;
-      text-align: center;
-      padding: 16px 0;
-    }
-
-    .transport {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .state {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #888;
-      font-size: 14px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .state-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #444;
-    }
-
-    .state-dot.playing {
-      background: #4ade80;
-      box-shadow: 0 0 10px #4ade80;
-    }
-
-    .bpm {
-      font-size: 32px;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    .bpm-label {
-      font-size: 12px;
-      color: #666;
-      font-weight: 500;
-    }
-
-    #waveform-canvas {
-      width: 100%;
-      height: 120px;
-      border-radius: 8px;
-    }
-
-    #spectrum-canvas {
-      width: 100%;
-      height: 100px;
-      border-radius: 8px;
-    }
-
-    .section-info {
-      text-align: center;
-    }
-
-    .section-name {
-      font-size: 24px;
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 4px;
-    }
-
-    .bar-info {
-      font-size: 14px;
-      color: #888;
-    }
-
-    .timeline-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .progress-bar {
-      height: 8px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 4px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #888, #fff);
-      width: 0%;
-      transition: width 0.1s linear;
-    }
-
-    .section-markers {
-      display: flex;
-      gap: 4px;
-    }
-
-    .marker {
-      flex: 1;
-      padding: 8px 4px;
-      text-align: center;
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      background: rgba(255, 255, 255, 0.05);
-      color: #666;
-      border-radius: 4px;
-      transition: all 0.3s ease;
-    }
-
-    .marker.active {
-      background: rgba(255, 255, 255, 0.15);
-      color: #fff;
-    }
-
-    .controls {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-    }
-
-    .control-btn {
-      padding: 12px 24px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      background: transparent;
-      color: #fff;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.2s ease;
-    }
-
-    .control-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-  </style>
+  <title>DJ Overlay - Lofi Controller</title>
+  <script src="https://unpkg.com/tone"></script>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <button id="play-btn">Start Lofi Session</button>
+  <div id="app">
+    <div id="visual-container"></div>
 
-  <div id="overlay">
-    <div class="title">LOFI STATION</div>
-
-    <div class="section transport">
-      <div class="state">
-        <div class="state-dot" id="state-dot"></div>
-        <span id="state-text">STOPPED</span>
-      </div>
-      <div style="text-align: right;">
-        <div class="bpm" id="bpm-display">78</div>
-        <div class="bpm-label">BPM</div>
-      </div>
+    <div id="controls">
+      <button id="btn-load-song" class="btn-secondary">Load Song</button>
+      <button id="btn-load-visual" class="btn-secondary">Load Visual</button>
+      <button id="btn-play" class="btn-primary">Play</button>
+      <button id="btn-pause" class="btn-outline">Pause</button>
+      <button id="btn-stop" class="btn-outline">Stop</button>
     </div>
 
-    <div class="section">
-      <canvas id="waveform-canvas"></canvas>
-    </div>
-
-    <div class="section">
-      <canvas id="spectrum-canvas"></canvas>
-    </div>
-
-    <div class="section section-info">
-      <div class="section-name" id="section-name">INTRO</div>
-      <div class="bar-info" id="bar-info">Bar 1 of 8</div>
-    </div>
-
-    <div class="section timeline-container">
-      <div class="progress-bar">
-        <div class="progress-fill" id="progress-fill"></div>
-      </div>
-      <div class="section-markers" id="section-markers"></div>
-    </div>
-
-    <div class="controls">
-      <button class="control-btn" id="stop-btn">Stop</button>
-      <button class="control-btn" id="restart-btn">Restart</button>
+    <div id="status">
+      <span class="status-item">
+        <span class="label">Deck:</span>
+        <span class="value" id="status-deck">A</span>
+      </span>
+      <span class="status-item">
+        <span class="label">Song:</span>
+        <span class="value" id="status-song">-</span>
+      </span>
+      <span class="status-item">
+        <span class="label">Section:</span>
+        <span class="value" id="status-section">-</span>
+      </span>
+      <span class="status-item">
+        <span class="label">Playing:</span>
+        <span class="value" id="status-playing">No</span>
+      </span>
     </div>
   </div>
 
-  <script>
-    // ============================================
-    // CONFIGURATION
-    // ============================================
+  <script type="module">
+    import { DJController } from './src/controller.js';
+    import { bus } from './src/event-bus.js';
 
-    const CONFIG = {
-      bpm: 78,
-      swing: 0.2,
-      swingSubdivision: '16n',
-      totalBars: 72
+    // Initialize controller
+    const controller = new DJController();
+    const visualContainer = document.getElementById('visual-container');
+
+    // Status elements
+    const statusDeck = document.getElementById('status-deck');
+    const statusSong = document.getElementById('status-song');
+    const statusSection = document.getElementById('status-section');
+    const statusPlaying = document.getElementById('status-playing');
+
+    // Initialize on page load
+    async function init() {
+      await controller.init(visualContainer);
+      console.log('DJ Controller initialized');
+    }
+
+    // Event listeners for status updates
+    bus.on('songLoaded', ({ deck, song }) => {
+      if (deck === controller.activeDeck) {
+        statusSong.textContent = song;
+      }
+    });
+
+    bus.on('sectionChange', ({ section }) => {
+      statusSection.textContent = section;
+    });
+
+    bus.on('play', () => {
+      statusPlaying.textContent = 'Yes';
+    });
+
+    bus.on('pause', () => {
+      statusPlaying.textContent = 'Paused';
+    });
+
+    bus.on('stop', () => {
+      statusPlaying.textContent = 'No';
+      statusSection.textContent = '-';
+    });
+
+    // Button handlers
+    document.getElementById('btn-load-song').onclick = async () => {
+      try {
+        await controller.loadSong('/lofi-demo-song/index.js', 'A');
+        statusSong.textContent = 'demo-song';
+      } catch (e) {
+        console.error('Failed to load song:', e);
+        alert('Failed to load song. Make sure lofi-demo-song exists.');
+      }
     };
 
-    const SECTIONS = [
-      { name: 'INTRO', startBar: 0, bars: 8 },
-      { name: 'VERSE A', startBar: 8, bars: 16 },
-      { name: 'VERSE B', startBar: 24, bars: 16 },
-      { name: 'BREAKDOWN', startBar: 40, bars: 8 },
-      { name: 'CLIMAX', startBar: 48, bars: 16 },
-      { name: 'OUTRO', startBar: 64, bars: 8 }
-    ];
-
-    // Section configurations (what plays when)
-    const SECTION_CONFIG = {
-      INTRO: { drums: false, bass: false, chords: true, melody: false, filterFreq: 600, reverbWet: 0.6 },
-      'VERSE A': { drums: true, bass: true, chords: true, melody: false, filterFreq: 1400, reverbWet: 0.35 },
-      'VERSE B': { drums: true, bass: true, chords: true, melody: true, filterFreq: 1800, reverbWet: 0.35 },
-      BREAKDOWN: { drums: false, bass: false, chords: true, melody: false, filterFreq: 800, reverbWet: 0.55 },
-      CLIMAX: { drums: true, bass: true, chords: true, melody: true, filterFreq: 2800, reverbWet: 0.45 },
-      OUTRO: { drums: false, bass: false, chords: true, melody: false, filterFreq: 500, reverbWet: 0.6 }
+    document.getElementById('btn-load-visual').onclick = async () => {
+      try {
+        await controller.loadVisual('/visual-waveform/index.js', 0);
+      } catch (e) {
+        console.error('Failed to load visual:', e);
+        alert('Failed to load visual. Make sure visual-waveform exists.');
+      }
     };
 
-    // ============================================
-    // AUDIO ENGINE
-    // ============================================
-
-    let isInitialized = false;
-    let instruments = {};
-    let effects = {};
-    let analysers = {};
-    let currentSection = SECTIONS[0];
-    let currentBar = 0;
-
-    async function initAudio() {
-      if (isInitialized) return;
-
-      await Tone.start();
-
-      // Set up transport
-      Tone.Transport.bpm.value = CONFIG.bpm;
-      Tone.Transport.swing = CONFIG.swing;
-      Tone.Transport.swingSubdivision = CONFIG.swingSubdivision;
-
-      // Create analysers
-      analysers.waveform = new Tone.Analyser('waveform', 256);
-      analysers.fft = new Tone.Analyser('fft', 32);
-
-      // Create effects chain
-      effects.filter = new Tone.Filter({
-        frequency: 1400,
-        type: 'lowpass',
-        rolloff: -24
-      });
-
-      effects.reverb = new Tone.Reverb({
-        decay: 2.5,
-        wet: 0.35
-      });
-      await effects.reverb.generate();
-
-      effects.delay = new Tone.FeedbackDelay({
-        delayTime: '8n.',
-        feedback: 0.2,
-        wet: 0.15
-      });
-
-      effects.compressor = new Tone.Compressor({
-        threshold: -20,
-        ratio: 4,
-        attack: 0.003,
-        release: 0.1
-      });
-
-      // Connect effects chain
-      effects.filter.connect(effects.reverb);
-      effects.reverb.connect(effects.delay);
-      effects.delay.connect(effects.compressor);
-      effects.compressor.connect(analysers.waveform);
-      analysers.waveform.connect(analysers.fft);
-      analysers.fft.toDestination();
-
-      // Create instruments
-      createInstruments();
-
-      // Create patterns
-      createPatterns();
-
-      // Schedule section changes
-      scheduleSections();
-
-      isInitialized = true;
-    }
-
-    function createInstruments() {
-      // Kick drum
-      instruments.kick = new Tone.MembraneSynth({
-        pitchDecay: 0.05,
-        octaves: 6,
-        oscillator: { type: 'sine' },
-        envelope: {
-          attack: 0.001,
-          decay: 0.4,
-          sustain: 0.01,
-          release: 0.4
-        }
-      });
-      instruments.kick.volume.value = -6;
-      instruments.kick.connect(effects.filter);
-
-      // Snare
-      instruments.snare = new Tone.NoiseSynth({
-        noise: { type: 'pink' },
-        envelope: {
-          attack: 0.001,
-          decay: 0.15,
-          sustain: 0,
-          release: 0.1
-        }
-      });
-      instruments.snare.volume.value = -12;
-      instruments.snare.connect(effects.filter);
-
-      // Hi-hat
-      instruments.hihat = new Tone.NoiseSynth({
-        noise: { type: 'white' },
-        envelope: {
-          attack: 0.001,
-          decay: 0.05,
-          sustain: 0,
-          release: 0.02
-        }
-      });
-      instruments.hihat.volume.value = -18;
-      instruments.hihat.connect(effects.filter);
-
-      // Chords (Rhodes-style)
-      instruments.chords = new Tone.PolySynth(Tone.Synth, {
-        oscillator: { type: 'triangle' },
-        envelope: {
-          attack: 0.02,
-          decay: 0.3,
-          sustain: 0.5,
-          release: 1
-        }
-      });
-      instruments.chords.volume.value = -10;
-      instruments.chords.connect(effects.filter);
-
-      // Bass
-      instruments.bass = new Tone.Synth({
-        oscillator: { type: 'sine' },
-        envelope: {
-          attack: 0.01,
-          decay: 0.2,
-          sustain: 0.8,
-          release: 0.3
-        }
-      });
-      instruments.bass.volume.value = -8;
-      instruments.bass.connect(effects.filter);
-
-      // Melody
-      instruments.melody = new Tone.Synth({
-        oscillator: { type: 'triangle' },
-        envelope: {
-          attack: 0.05,
-          decay: 0.2,
-          sustain: 0.4,
-          release: 0.5
-        }
-      });
-      instruments.melody.volume.value = -12;
-      instruments.melody.connect(effects.filter);
-    }
-
-    // Humanization helpers
-    function humanize(time, ms = 20) {
-      return time + (Math.random() - 0.5) * (ms / 1000);
-    }
-
-    function humanVelocity(base = 0.8, variance = 0.15) {
-      return Math.max(0.3, Math.min(1, base + (Math.random() - 0.5) * variance));
-    }
-
-    // Chord progressions
-    const CHORDS = {
-      classic: [
-        ['D3', 'F3', 'A3', 'C4'],   // Dm7
-        ['G3', 'B3', 'D4', 'F4'],   // G7
-        ['C3', 'E3', 'G3', 'B3'],   // Cmaj7
-        ['A3', 'C4', 'E4', 'G4']    // Am7
-      ]
+    document.getElementById('btn-play').onclick = async () => {
+      if (!controller.deckA && !controller.deckB) {
+        alert('Load a song first!');
+        return;
+      }
+      await controller.play();
     };
 
-    const BASS_NOTES = ['D2', 'G2', 'C2', 'A2'];
-
-    const MELODY_PATTERNS = [
-      ['E4', 'D4', 'C4', 'A3'],
-      ['G4', 'E4', 'D4', 'C4'],
-      ['A4', 'G4', 'E4', 'D4']
-    ];
-
-    function createPatterns() {
-      // Drum pattern - boom bap style
-      instruments.drumLoop = new Tone.Loop((time) => {
-        const config = SECTION_CONFIG[currentSection.name];
-        if (!config?.drums) return;
-
-        const bar = Math.floor((Tone.Transport.position.split(':')[0]) % 4);
-
-        // Kick on 1 and 3 (with variations)
-        instruments.kick.triggerAttackRelease('C1', '8n', humanize(time), humanVelocity(0.9));
-        instruments.kick.triggerAttackRelease('C1', '8n', humanize(time + Tone.Time('2n').toSeconds()), humanVelocity(0.85));
-
-        // Ghost kick sometimes
-        if (Math.random() > 0.7) {
-          instruments.kick.triggerAttackRelease('C1', '16n', humanize(time + Tone.Time('4n.').toSeconds()), humanVelocity(0.5));
-        }
-
-        // Snare on 2 and 4
-        instruments.snare.triggerAttackRelease('8n', humanize(time + Tone.Time('4n').toSeconds()), humanVelocity(0.8));
-        instruments.snare.triggerAttackRelease('8n', humanize(time + Tone.Time('2n.').toSeconds()), humanVelocity(0.75));
-
-      }, '1m').start(0);
-
-      // Hi-hat pattern
-      instruments.hihatLoop = new Tone.Loop((time) => {
-        const config = SECTION_CONFIG[currentSection.name];
-        if (!config?.drums) return;
-
-        // 8th note hi-hats with swing
-        for (let i = 0; i < 8; i++) {
-          const vel = i % 2 === 0 ? humanVelocity(0.6) : humanVelocity(0.35);
-          instruments.hihat.triggerAttackRelease('16n', humanize(time + i * Tone.Time('8n').toSeconds(), 15), vel);
-        }
-      }, '1m').start(0);
-
-      // Chord progression
-      instruments.chordLoop = new Tone.Loop((time) => {
-        const config = SECTION_CONFIG[currentSection.name];
-        if (!config?.chords) return;
-
-        const chordIndex = Math.floor((Tone.Transport.position.split(':')[0]) % 4);
-        const chord = CHORDS.classic[chordIndex];
-
-        instruments.chords.triggerAttackRelease(chord, '2n', humanize(time, 25), humanVelocity(0.7));
-      }, '1m').start(0);
-
-      // Bass line
-      instruments.bassLoop = new Tone.Loop((time) => {
-        const config = SECTION_CONFIG[currentSection.name];
-        if (!config?.bass) return;
-
-        const noteIndex = Math.floor((Tone.Transport.position.split(':')[0]) % 4);
-        const note = BASS_NOTES[noteIndex];
-
-        instruments.bass.triggerAttackRelease(note, '2n', humanize(time), humanVelocity(0.85));
-
-        // Occasional octave jump
-        if (Math.random() > 0.7) {
-          const octaveUp = note.replace('2', '3');
-          instruments.bass.triggerAttackRelease(octaveUp, '8n', humanize(time + Tone.Time('2n').toSeconds()), humanVelocity(0.6));
-        }
-      }, '1m').start(0);
-
-      // Melody (plays only in certain sections)
-      instruments.melodyLoop = new Tone.Loop((time) => {
-        const config = SECTION_CONFIG[currentSection.name];
-        if (!config?.melody) return;
-
-        const barNum = Math.floor((Tone.Transport.position.split(':')[0]) % 4);
-        const pattern = MELODY_PATTERNS[barNum % MELODY_PATTERNS.length];
-
-        // Play melody notes with rhythm variation
-        if (Math.random() > 0.3) {
-          instruments.melody.triggerAttackRelease(pattern[0], '8n', humanize(time), humanVelocity(0.7));
-        }
-        if (Math.random() > 0.4) {
-          instruments.melody.triggerAttackRelease(pattern[1], '8n', humanize(time + Tone.Time('4n').toSeconds()), humanVelocity(0.6));
-        }
-        if (Math.random() > 0.5) {
-          instruments.melody.triggerAttackRelease(pattern[2], '4n', humanize(time + Tone.Time('2n').toSeconds()), humanVelocity(0.65));
-        }
-      }, '1m').start(0);
-    }
-
-    function scheduleSections() {
-      SECTIONS.forEach((section, index) => {
-        const startTime = `${section.startBar}:0:0`;
-
-        Tone.Transport.schedule((time) => {
-          currentSection = section;
-          currentBar = 0;
-
-          const config = SECTION_CONFIG[section.name];
-          if (config) {
-            // Smooth filter transition
-            effects.filter.frequency.rampTo(config.filterFreq, 0.5);
-            effects.reverb.wet.rampTo(config.reverbWet, 0.5);
-          }
-        }, startTime);
-      });
-
-      // Update current bar every measure
-      Tone.Transport.scheduleRepeat((time) => {
-        const bars = parseInt(Tone.Transport.position.split(':')[0]);
-        currentBar = bars;
-
-        // Update current section based on bar
-        for (let i = SECTIONS.length - 1; i >= 0; i--) {
-          if (bars >= SECTIONS[i].startBar) {
-            currentSection = SECTIONS[i];
-            break;
-          }
-        }
-      }, '1m');
-
-      // Stop at end
-      Tone.Transport.schedule((time) => {
-        Tone.Transport.stop();
-      }, `${CONFIG.totalBars}:0:0`);
-    }
-
-    // ============================================
-    // VISUALIZATION
-    // ============================================
-
-    const waveformCanvas = document.getElementById('waveform-canvas');
-    const spectrumCanvas = document.getElementById('spectrum-canvas');
-    const waveformCtx = waveformCanvas.getContext('2d');
-    const spectrumCtx = spectrumCanvas.getContext('2d');
-
-    // Set canvas resolution
-    function setupCanvas(canvas, ctx) {
-      const rect = canvas.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      ctx.scale(dpr, dpr);
-      return { width: rect.width, height: rect.height };
-    }
-
-    let waveformSize, spectrumSize;
-
-    function initCanvases() {
-      waveformSize = setupCanvas(waveformCanvas, waveformCtx);
-      spectrumSize = setupCanvas(spectrumCanvas, spectrumCtx);
-    }
-
-    function drawWaveform() {
-      if (!analysers.waveform) return;
-
-      const data = analysers.waveform.getValue();
-      const { width, height } = waveformSize;
-
-      waveformCtx.clearRect(0, 0, width, height);
-
-      // Draw waveform
-      waveformCtx.beginPath();
-      waveformCtx.strokeStyle = '#fff';
-      waveformCtx.lineWidth = 2;
-
-      const sliceWidth = width / data.length;
-      let x = 0;
-
-      for (let i = 0; i < data.length; i++) {
-        const v = (data[i] + 1) / 2;
-        const y = v * height;
-
-        if (i === 0) {
-          waveformCtx.moveTo(x, y);
-        } else {
-          waveformCtx.lineTo(x, y);
-        }
-        x += sliceWidth;
-      }
-
-      waveformCtx.stroke();
-
-      // Draw center line
-      waveformCtx.beginPath();
-      waveformCtx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-      waveformCtx.lineWidth = 1;
-      waveformCtx.moveTo(0, height / 2);
-      waveformCtx.lineTo(width, height / 2);
-      waveformCtx.stroke();
-    }
-
-    function drawSpectrum() {
-      if (!analysers.fft) return;
-
-      const data = analysers.fft.getValue();
-      const { width, height } = spectrumSize;
-
-      spectrumCtx.clearRect(0, 0, width, height);
-
-      const barWidth = width / data.length - 4;
-      let x = 2;
-
-      for (let i = 0; i < data.length; i++) {
-        // Convert dB to 0-1 range
-        const db = data[i];
-        const normalized = Math.max(0, (db + 100) / 100);
-        const barHeight = normalized * height * 0.9;
-
-        // Gradient from gray to white based on amplitude
-        const brightness = Math.floor(100 + normalized * 155);
-        spectrumCtx.fillStyle = `rgb(${brightness}, ${brightness}, ${brightness})`;
-
-        spectrumCtx.fillRect(x, height - barHeight, barWidth, barHeight);
-        x += barWidth + 4;
-      }
-    }
-
-    // ============================================
-    // UI UPDATES
-    // ============================================
-
-    const stateText = document.getElementById('state-text');
-    const stateDot = document.getElementById('state-dot');
-    const bpmDisplay = document.getElementById('bpm-display');
-    const sectionName = document.getElementById('section-name');
-    const barInfo = document.getElementById('bar-info');
-    const progressFill = document.getElementById('progress-fill');
-    const sectionMarkersContainer = document.getElementById('section-markers');
-
-    // Create section markers
-    function createSectionMarkers() {
-      sectionMarkersContainer.innerHTML = '';
-      SECTIONS.forEach(section => {
-        const marker = document.createElement('div');
-        marker.className = 'marker';
-        marker.id = `marker-${section.name.replace(/\s/g, '-')}`;
-        marker.textContent = section.name.split(' ')[0];
-        marker.style.flex = section.bars;
-        sectionMarkersContainer.appendChild(marker);
-      });
-    }
-
-    function updateUI() {
-      // Transport state
-      const state = Tone.Transport.state;
-      stateText.textContent = state.toUpperCase();
-      stateDot.classList.toggle('playing', state === 'started');
-
-      // BPM
-      bpmDisplay.textContent = Math.round(Tone.Transport.bpm.value);
-
-      // Current section
-      sectionName.textContent = currentSection.name;
-
-      // Bar info
-      const barsIntoSection = currentBar - currentSection.startBar;
-      barInfo.textContent = `Bar ${barsIntoSection + 1} of ${currentSection.bars}`;
-
-      // Progress
-      const progress = (currentBar / CONFIG.totalBars) * 100;
-      progressFill.style.width = `${progress}%`;
-
-      // Section markers
-      document.querySelectorAll('.marker').forEach(marker => {
-        marker.classList.remove('active');
-      });
-      const activeMarker = document.getElementById(`marker-${currentSection.name.replace(/\s/g, '-')}`);
-      if (activeMarker) activeMarker.classList.add('active');
-    }
-
-    // ============================================
-    // MAIN LOOP
-    // ============================================
-
-    function draw() {
-      drawWaveform();
-      drawSpectrum();
-      updateUI();
-      requestAnimationFrame(draw);
-    }
-
-    // ============================================
-    // EVENT HANDLERS
-    // ============================================
-
-    const playBtn = document.getElementById('play-btn');
-    const stopBtn = document.getElementById('stop-btn');
-    const restartBtn = document.getElementById('restart-btn');
-
-    async function startSession() {
-      if (isInitialized) return;
-      await initAudio();
-      playBtn.classList.add('hidden');
-      initCanvases();
-      createSectionMarkers();
-      Tone.Transport.start();
-      draw();
-    }
-
-    // Click button OR anywhere on page to start
-    playBtn.addEventListener('click', startSession);
-    document.addEventListener('click', startSession, { once: true });
-
-    // Also try to auto-start on page load (works in OBS browser source)
-    window.addEventListener('load', async () => {
-      // Small delay to let OBS browser source initialize
-      setTimeout(async () => {
-        try {
-          await startSession();
-        } catch (e) {
-          // Browser blocked auto-start, user will need to click
-          console.log('Auto-start blocked, click to start');
-        }
-      }, 500);
-    });
-
-    stopBtn.addEventListener('click', (e) => {
-      e.stopPropagation(); // Don't trigger startSession
-      if (Tone.Transport.state === 'started') {
-        Tone.Transport.pause();
-      } else {
-        Tone.Transport.start();
-      }
-    });
-
-    restartBtn.addEventListener('click', (e) => {
-      e.stopPropagation(); // Don't trigger startSession
-      Tone.Transport.stop();
-      Tone.Transport.position = 0;
-      currentSection = SECTIONS[0];
-      currentBar = 0;
-      Tone.Transport.start();
-    });
-
-    // Handle window resize
-    window.addEventListener('resize', () => {
-      if (isInitialized) {
-        initCanvases();
-      }
-    });
+    document.getElementById('btn-pause').onclick = () => {
+      controller.pause();
+    };
+
+    document.getElementById('btn-stop').onclick = () => {
+      controller.stop();
+    };
+
+    // Initialize
+    init();
   </script>
 </body>
 </html>
