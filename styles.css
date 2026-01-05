@@ -9,6 +9,9 @@ body {
   background: transparent;
   color: #e0e0e0;
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 #app {
@@ -19,17 +22,21 @@ body {
   overflow: hidden;
 }
 
-/* Sidebar */
+/* Sidebar - compact top-left controls */
 #sidebar {
-  width: 300px;
-  min-width: 300px;
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 360px;
+  min-width: 360px;
   display: flex;
   flex-direction: column;
-  background: rgba(0, 0, 0, 0.15);
+  background: rgba(20, 20, 30, 0.85);
   backdrop-filter: blur(12px);
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 24px;
-  gap: 20px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 10px;
+  gap: 6px;
   z-index: 10;
 }
 
@@ -53,38 +60,40 @@ body {
 /* Controls */
 #controls {
   display: flex;
-  flex-direction: column;
-  gap: 20px;
+  flex-direction: row;
+  gap: 8px;
+  align-items: flex-end;
 }
 
 .control-row {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 2px;
+  flex: 1;
 }
 
 .control-row label {
   font-size: 11px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.5);
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  letter-spacing: 0.5px;
 }
 
 .select-control {
   width: 100%;
-  padding: 14px 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
   color: #fff;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 16px center;
+  background-position: right 10px center;
   transition: all 0.2s ease;
 }
 
@@ -108,8 +117,8 @@ body {
 /* Buttons */
 .control-buttons {
   display: flex;
-  gap: 10px;
-  margin-top: 8px;
+  gap: 4px;
+  margin-top: 0;
 }
 
 .control-buttons button {
@@ -117,15 +126,15 @@ body {
 }
 
 button {
-  padding: 14px 20px;
+  padding: 8px 12px;
   border: none;
-  border-radius: 12px;
-  font-size: 13px;
+  border-radius: 6px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
 }
 
 button:hover {
@@ -165,93 +174,96 @@ button:active {
 
 /* Song Info Card */
 #song-info {
-  padding: 20px;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 16px;
+  padding: 6px 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+#song-info .song-main {
+  flex: 1;
+  min-width: 0;
 }
 
 #song-info .song-title {
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 700;
   color: #fff;
-  margin-bottom: 6px;
+  margin-bottom: 2px;
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #song-info .song-description {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
-  line-height: 1.5;
-  margin-bottom: 16px;
+  display: none;
 }
 
 #song-info .song-meta {
   display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+  gap: 4px;
+  flex-wrap: nowrap;
 }
 
 #song-info .meta-item {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 10px 14px;
-  background: rgba(139, 92, 246, 0.1);
-  border-radius: 10px;
-  min-width: 70px;
+  gap: 1px;
+  padding: 5px 8px;
+  background: rgba(139, 92, 246, 0.15);
+  border-radius: 6px;
+  min-width: 45px;
 }
 
 #song-info .meta-label {
   font-size: 9px;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.3px;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 #song-info .meta-value {
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 700;
   color: #8b5cf6;
   font-family: 'SF Mono', 'Fira Code', monospace;
 }
 
 #song-info .song-tags {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-top: 12px;
+  display: none;
 }
 
 #song-info .tag {
-  font-size: 10px;
-  padding: 4px 10px;
+  font-size: 7px;
+  padding: 2px 5px;
   background: rgba(255, 255, 255, 0.05);
-  border-radius: 20px;
+  border-radius: 8px;
   color: rgba(255, 255, 255, 0.6);
   text-transform: lowercase;
 }
 
 /* Now Playing Indicator */
 #song-info .now-playing {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
+  display: none;
 }
 
 #song-info .now-playing-dot {
-  width: 8px;
-  height: 8px;
+  width: 5px;
+  height: 5px;
   background: #22c55e;
   border-radius: 50%;
   animation: pulse 1.5s ease-in-out infinite;
 }
 
 #song-info .now-playing-text {
-  font-size: 10px;
+  font-size: 7px;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  letter-spacing: 0.5px;
   color: #22c55e;
   font-weight: 600;
 }
@@ -261,20 +273,16 @@ button:active {
   50% { opacity: 0.5; transform: scale(0.9); }
 }
 
-/* Status Panel */
+/* Status Panel - hidden in compact mode */
 #status {
-  margin-top: auto;
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  display: none;
 }
 
 .status-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
+  padding: 4px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
@@ -288,13 +296,13 @@ button:active {
 }
 
 #status .label {
-  font-size: 12px;
+  font-size: 9px;
   color: rgba(255, 255, 255, 0.35);
   font-weight: 500;
 }
 
 #status .value {
-  font-size: 13px;
+  font-size: 10px;
   color: #8b5cf6;
   font-family: 'SF Mono', 'Fira Code', monospace;
   font-weight: 600;
