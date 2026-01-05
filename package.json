@@ -1,17 +1,8 @@
 {
   "name": "dj-overlay",
   "version": "1.0.0",
-  "description": "Lofi DJ Overlay for OBS",
+  "description": "Lofi DJ Controller",
   "scripts": {
-    "start": "npx serve .. -p 3000 -C",
-    "create": "node add-to-obs.js create",
-    "show": "node add-to-obs.js show",
-    "hide": "node add-to-obs.js hide",
-    "refresh": "node add-to-obs.js refresh",
-    "remove": "node add-to-obs.js remove"
-  },
-  "dependencies": {
-    "dotenv": "^16.3.1",
-    "obs-websocket-js": "^5.0.6"
+    "start": "npx serve .. -p 3000 -C"
   }
 }

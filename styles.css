@@ -13,8 +13,19 @@ body {
 
 #app {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   height: 100vh;
+}
+
+/* Sidebar (left 25%) */
+#sidebar {
+  width: 25%;
+  min-width: 200px;
+  max-width: 350px;
+  display: flex;
+  flex-direction: column;
+  background: #16213e;
+  border-right: 1px solid #333;
 }
 
 /* Visual Container */
@@ -34,11 +45,9 @@ body {
 /* Controls */
 #controls {
   padding: 20px;
-  background: #16213e;
   display: flex;
+  flex-direction: column;
   gap: 10px;
-  flex-wrap: wrap;
-  align-items: center;
 }
 
 button {
@@ -89,11 +98,12 @@ button:active {
 
 /* Status */
 #status {
-  padding: 10px 20px;
+  padding: 20px;
   background: #0f0f1a;
   font-size: 12px;
   color: #888;
   border-top: 1px solid #333;
+  margin-top: auto;
 }
 
 #status .label {
@@ -107,6 +117,10 @@ button:active {
 }
 
 .status-item {
-  display: inline-block;
-  margin-right: 20px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.status-item:last-child {
+  margin-bottom: 0;
 }

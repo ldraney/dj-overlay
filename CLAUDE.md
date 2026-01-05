@@ -1,6 +1,6 @@
 # DJ Overlay - Claude Guide
 
-The controller for the lofi music + visuals ecosystem. Manages song playback, visual rendering, crossfading, and OBS integration.
+The controller for the lofi music + visuals ecosystem. Manages song playback, visual rendering, and crossfading.
 
 ## Quick Start
 
@@ -8,7 +8,7 @@ The controller for the lofi music + visuals ecosystem. Manages song playback, vi
 cd ~/dj-overlay
 npm start
 # Server runs at http://localhost:3000
-# Open http://localhost:3000/dj-overlay/ in browser or OBS
+# Open http://localhost:3000/dj-overlay/ in browser
 ```
 
 ## Architecture
@@ -53,7 +53,6 @@ dj-overlay/
 │   ├── controller.js   # DJController class - main orchestrator
 │   ├── audio-chain.js  # Tone.js audio routing
 │   └── event-bus.js    # Event communication
-├── add-to-obs.js       # OBS WebSocket integration script
 └── package.json        # npm start serves from parent dir
 ```
 
@@ -161,24 +160,6 @@ bus.on('visualLoaded', ({ name, layer }) => { });
 
 // Emit
 bus.emit('eventName', data);
-```
-
-## OBS Integration
-
-**Manual Setup:**
-1. `npm start` in dj-overlay
-2. OBS → Sources → + → Browser
-3. URL: `http://localhost:3000/dj-overlay/`
-4. Width/Height: Match your canvas (1920x1080)
-5. Right-click source → Interact to click buttons
-
-**For streaming (hide UI):**
-Set in config.json:
-```json
-{
-  "display": { "showControls": false, "showStatus": false },
-  "defaults": { "autoPlay": true }
-}
 ```
 
 ## Adding a New Song

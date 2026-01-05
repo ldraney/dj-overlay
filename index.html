@@ -9,34 +9,36 @@
 </head>
 <body>
   <div id="app">
+    <div id="sidebar">
+      <div id="controls">
+        <button id="btn-load-song" class="btn-secondary">Load Song</button>
+        <button id="btn-load-visual" class="btn-secondary">Load Visual</button>
+        <button id="btn-play" class="btn-primary">Play</button>
+        <button id="btn-pause" class="btn-outline">Pause</button>
+        <button id="btn-stop" class="btn-outline">Stop</button>
+      </div>
+
+      <div id="status">
+        <div class="status-item">
+          <span class="label">Deck:</span>
+          <span class="value" id="status-deck">A</span>
+        </div>
+        <div class="status-item">
+          <span class="label">Song:</span>
+          <span class="value" id="status-song">-</span>
+        </div>
+        <div class="status-item">
+          <span class="label">Section:</span>
+          <span class="value" id="status-section">-</span>
+        </div>
+        <div class="status-item">
+          <span class="label">Playing:</span>
+          <span class="value" id="status-playing">No</span>
+        </div>
+      </div>
+    </div>
+
     <div id="visual-container"></div>
-
-    <div id="controls">
-      <button id="btn-load-song" class="btn-secondary">Load Song</button>
-      <button id="btn-load-visual" class="btn-secondary">Load Visual</button>
-      <button id="btn-play" class="btn-primary">Play</button>
-      <button id="btn-pause" class="btn-outline">Pause</button>
-      <button id="btn-stop" class="btn-outline">Stop</button>
-    </div>
-
-    <div id="status">
-      <span class="status-item">
-        <span class="label">Deck:</span>
-        <span class="value" id="status-deck">A</span>
-      </span>
-      <span class="status-item">
-        <span class="label">Song:</span>
-        <span class="value" id="status-song">-</span>
-      </span>
-      <span class="status-item">
-        <span class="label">Section:</span>
-        <span class="value" id="status-section">-</span>
-      </span>
-      <span class="status-item">
-        <span class="label">Playing:</span>
-        <span class="value" id="status-playing">No</span>
-      </span>
-    </div>
   </div>
 
   <script type="module">
