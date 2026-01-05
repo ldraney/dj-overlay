@@ -30,18 +30,34 @@
         </div>
       </div>
 
+      <div id="song-info">
+        <div class="now-playing" id="now-playing-indicator" style="display: none;">
+          <div class="now-playing-dot"></div>
+          <span class="now-playing-text">Now Playing</span>
+        </div>
+        <div class="song-title" id="song-title">-</div>
+        <div class="song-description" id="song-description">Select a song to begin</div>
+        <div class="song-meta">
+          <div class="meta-item">
+            <span class="meta-label">BPM</span>
+            <span class="meta-value" id="song-bpm">--</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Duration</span>
+            <span class="meta-value" id="song-duration">--</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Section</span>
+            <span class="meta-value" id="song-section">--</span>
+          </div>
+        </div>
+        <div class="song-tags" id="song-tags"></div>
+      </div>
+
       <div id="status">
         <div class="status-item">
           <span class="label">Deck:</span>
           <span class="value" id="status-deck">A</span>
-        </div>
-        <div class="status-item">
-          <span class="label">Song:</span>
-          <span class="value" id="status-song">-</span>
-        </div>
-        <div class="status-item">
-          <span class="label">Section:</span>
-          <span class="value" id="status-section">-</span>
         </div>
         <div class="status-item">
           <span class="label">Playing:</span>
@@ -63,9 +79,17 @@
 
     // Status elements
     const statusDeck = document.getElementById('status-deck');
-    const statusSong = document.getElementById('status-song');
-    const statusSection = document.getElementById('status-section');
     const statusPlaying = document.getElementById('status-playing');
+
+    // Song info elements
+    const songInfoCard = document.getElementById('song-info');
+    const songTitle = document.getElementById('song-title');
+    const songDescription = document.getElementById('song-description');
+    const songBpm = document.getElementById('song-bpm');
+    const songDuration = document.getElementById('song-duration');
+    const songSection = document.getElementById('song-section');
+    const songTags = document.getElementById('song-tags');
+    const nowPlayingIndicator = document.getElementById('now-playing-indicator');
 
     // Dropdown elements
     const selectSong = document.getElementById('select-song');
@@ -99,6 +123,39 @@
       }
     } catch (e) {
       console.log('[DJ] No registry.json found');
+    }
+
+    // Load and display song metadata
+    async function loadSongMetadata(songPath) {
+      try {
+        // Get manifest path from song path
+        const manifestPath = songPath.replace('/index.js', '/manifest.json');
+        const response = await fetch(manifestPath);
+        if (response.ok) {
+          const manifest = await response.json();
+
+          // Update song info card
+          songInfoCard.classList.add('visible');
+          songTitle.textContent = manifest.displayName || manifest.name || 'Unknown';
+          songDescription.textContent = manifest.description || 'No description available';
+          songBpm.textContent = manifest.bpm || '--';
+          songDuration.textContent = manifest.duration || '--';
+          songSection.textContent = manifest.sections?.[0] || '--';
+
+          // Update tags
+          songTags.innerHTML = '';
+          if (manifest.tags && manifest.tags.length > 0) {
+            manifest.tags.forEach(tag => {
+              const tagEl = document.createElement('span');
+              tagEl.className = 'tag';
+              tagEl.textContent = tag;
+              songTags.appendChild(tagEl);
+            });
+          }
+        }
+      } catch (e) {
+        console.log('[DJ] Could not load manifest:', e);
+      }
     }
 
     // Populate dropdowns from registry
@@ -146,7 +203,7 @@
       if (config.defaults?.song) {
         try {
           await controller.loadSong(config.defaults.song, 'A');
-          statusSong.textContent = config.defaults.song.split('/').filter(Boolean)[0];
+          await loadSongMetadata(config.defaults.song);
           selectSong.value = config.defaults.song;
           console.log('[DJ] Auto-loaded song:', config.defaults.song);
         } catch (e) {
@@ -173,26 +230,26 @@
 
     // Event listeners for status updates
     bus.on('songLoaded', ({ deck, song }) => {
-      if (deck === controller.activeDeck) {
-        statusSong.textContent = song;
-      }
+      // Song loaded event handled elsewhere
     });
 
     bus.on('sectionChange', ({ section }) => {
-      statusSection.textContent = section;
+      songSection.textContent = section;
     });
 
     bus.on('play', () => {
       statusPlaying.textContent = 'Yes';
+      nowPlayingIndicator.style.display = 'flex';
     });
 
     bus.on('pause', () => {
       statusPlaying.textContent = 'Paused';
+      nowPlayingIndicator.style.display = 'none';
     });
 
     bus.on('stop', () => {
       statusPlaying.textContent = 'No';
-      statusSection.textContent = '-';
+      nowPlayingIndicator.style.display = 'none';
     });
 
     // Dropdown handlers
@@ -201,8 +258,8 @@
       if (!path) return;
       try {
         await controller.loadSong(path, 'A');
+        await loadSongMetadata(path);
         const songName = path.split('/').filter(Boolean)[0];
-        statusSong.textContent = songName;
         console.log('[DJ] Loaded song:', songName);
       } catch (e) {
         console.error('Failed to load song:', e);

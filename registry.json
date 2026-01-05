@@ -15,6 +15,20 @@
       "description": "Slow ambient lofi with chill vibes"
     },
     {
+      "name": "midnight-rain",
+      "path": "/lofi-midnight-rain-song",
+      "status": "ready",
+      "created": "2025-01-04",
+      "description": "Moody A minor progression with rainy atmosphere"
+    },
+    {
+      "name": "rainy-night",
+      "path": "/lofi-rainy-night-song",
+      "status": "ready",
+      "created": "2026-01-04",
+      "description": "Chill, mellow lofi for late-night study sessions"
+    },
+    {
       "name": "template",
       "path": "/lofi-song-template",
       "status": "template",
@@ -29,6 +43,20 @@
       "status": "ready",
       "created": "2025-01-04",
       "description": "Simple waveform visualization"
+    },
+    {
+      "name": "particles",
+      "path": "/visual-particles",
+      "status": "ready",
+      "created": "2025-01-04",
+      "description": "Bass-triggered particle bursts with mid wind and high sparkles"
+    },
+    {
+      "name": "geometric",
+      "path": "/visual-geometric",
+      "status": "ready",
+      "created": "2025-01-04",
+      "description": "Rotating concentric polygons, section-aware complexity"
     },
     {
       "name": "template",
