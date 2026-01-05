@@ -11,11 +11,23 @@
   <div id="app">
     <div id="sidebar">
       <div id="controls">
-        <button id="btn-load-song" class="btn-secondary">Load Song</button>
-        <button id="btn-load-visual" class="btn-secondary">Load Visual</button>
-        <button id="btn-play" class="btn-primary">Play</button>
-        <button id="btn-pause" class="btn-outline">Pause</button>
-        <button id="btn-stop" class="btn-outline">Stop</button>
+        <div class="control-row">
+          <label for="select-song">Song:</label>
+          <select id="select-song" class="select-control">
+            <option value="">-- Select Song --</option>
+          </select>
+        </div>
+        <div class="control-row">
+          <label for="select-visual">Visual:</label>
+          <select id="select-visual" class="select-control">
+            <option value="">-- Select Visual --</option>
+          </select>
+        </div>
+        <div class="control-buttons">
+          <button id="btn-play" class="btn-primary">Play</button>
+          <button id="btn-pause" class="btn-outline">Pause</button>
+          <button id="btn-stop" class="btn-outline">Stop</button>
+        </div>
       </div>
 
       <div id="status">
@@ -55,6 +67,13 @@
     const statusSection = document.getElementById('status-section');
     const statusPlaying = document.getElementById('status-playing');
 
+    // Dropdown elements
+    const selectSong = document.getElementById('select-song');
+    const selectVisual = document.getElementById('select-visual');
+
+    // Registry data
+    let registry = { songs: [], visuals: [] };
+
     // Load config
     let config = {
       defaults: { song: null, visual: null, autoPlay: false },
@@ -71,6 +90,42 @@
       console.log('[DJ] No config.json found, using defaults');
     }
 
+    // Load registry
+    try {
+      const response = await fetch('./registry.json');
+      if (response.ok) {
+        registry = await response.json();
+        console.log('[DJ] Registry loaded:', registry);
+      }
+    } catch (e) {
+      console.log('[DJ] No registry.json found');
+    }
+
+    // Populate dropdowns from registry
+    function populateDropdowns() {
+      // Songs - only show "ready" status
+      registry.songs
+        .filter(s => s.status === 'ready')
+        .forEach(song => {
+          const option = document.createElement('option');
+          option.value = song.path + '/index.js';
+          option.textContent = song.name;
+          option.title = song.description || '';
+          selectSong.appendChild(option);
+        });
+
+      // Visuals - only show "ready" status
+      registry.visuals
+        .filter(v => v.status === 'ready')
+        .forEach(visual => {
+          const option = document.createElement('option');
+          option.value = visual.path + '/index.js';
+          option.textContent = visual.name;
+          option.title = visual.description || '';
+          selectVisual.appendChild(option);
+        });
+    }
+
     // Apply display settings
     if (!config.display?.showControls) {
       document.getElementById('controls').style.display = 'none';
@@ -84,11 +139,15 @@
       await controller.init(visualContainer);
       console.log('[DJ] Controller initialized');
 
+      // Populate dropdowns
+      populateDropdowns();
+
       // Auto-load defaults from config
       if (config.defaults?.song) {
         try {
           await controller.loadSong(config.defaults.song, 'A');
           statusSong.textContent = config.defaults.song.split('/').filter(Boolean)[0];
+          selectSong.value = config.defaults.song;
           console.log('[DJ] Auto-loaded song:', config.defaults.song);
         } catch (e) {
           console.error('[DJ] Failed to auto-load song:', e);
@@ -98,6 +157,7 @@
       if (config.defaults?.visual) {
         try {
           await controller.loadVisual(config.defaults.visual, 0);
+          selectVisual.value = config.defaults.visual;
           console.log('[DJ] Auto-loaded visual:', config.defaults.visual);
         } catch (e) {
           console.error('[DJ] Failed to auto-load visual:', e);
@@ -135,26 +195,35 @@
       statusSection.textContent = '-';
     });
 
-    // Button handlers
-    document.getElementById('btn-load-song').onclick = async () => {
+    // Dropdown handlers
+    selectSong.onchange = async () => {
+      const path = selectSong.value;
+      if (!path) return;
       try {
-        await controller.loadSong('/lofi-demo-song/index.js', 'A');
-        statusSong.textContent = 'demo-song';
+        await controller.loadSong(path, 'A');
+        const songName = path.split('/').filter(Boolean)[0];
+        statusSong.textContent = songName;
+        console.log('[DJ] Loaded song:', songName);
       } catch (e) {
         console.error('Failed to load song:', e);
-        alert('Failed to load song. Make sure lofi-demo-song exists.');
+        alert('Failed to load song: ' + e.message);
       }
     };
 
-    document.getElementById('btn-load-visual').onclick = async () => {
+    selectVisual.onchange = async () => {
+      const path = selectVisual.value;
+      if (!path) return;
       try {
-        await controller.loadVisual('/visual-waveform/index.js', 0);
+        await controller.loadVisual(path, 0);
+        const visualName = path.split('/').filter(Boolean)[0];
+        console.log('[DJ] Loaded visual:', visualName);
       } catch (e) {
         console.error('Failed to load visual:', e);
-        alert('Failed to load visual. Make sure visual-waveform exists.');
+        alert('Failed to load visual: ' + e.message);
       }
     };
 
+    // Button handlers
     document.getElementById('btn-play').onclick = async () => {
       if (!controller.deckA && !controller.deckB) {
         alert('Load a song first!');

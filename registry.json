@@ -1,0 +1,41 @@
+{
+  "songs": [
+    {
+      "name": "demo-song",
+      "path": "/lofi-demo-song",
+      "status": "ready",
+      "created": "2025-01-04",
+      "description": "Reference implementation with drums, bass, and chords"
+    },
+    {
+      "name": "chill-song",
+      "path": "/lofi-chill-song",
+      "status": "ready",
+      "created": "2025-01-04",
+      "description": "Slow ambient lofi with chill vibes"
+    },
+    {
+      "name": "template",
+      "path": "/lofi-song-template",
+      "status": "template",
+      "created": "2025-01-04",
+      "description": "Starter template for new songs"
+    }
+  ],
+  "visuals": [
+    {
+      "name": "waveform",
+      "path": "/visual-waveform",
+      "status": "ready",
+      "created": "2025-01-04",
+      "description": "Simple waveform visualization"
+    },
+    {
+      "name": "template",
+      "path": "/visual-template",
+      "status": "template",
+      "created": "2025-01-04",
+      "description": "Starter template for new visuals"
+    }
+  ]
+}

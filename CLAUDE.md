@@ -61,6 +61,87 @@ Songs and visuals are sibling directories. `npm start` serves from `~/` so all p
 
 ---
 
+## Project Registry
+
+All songs and visuals are tracked in `registry.json`:
+
+```json
+{
+  "songs": [
+    { "name": "demo-song", "path": "/lofi-demo-song", "status": "ready", "description": "..." }
+  ],
+  "visuals": [
+    { "name": "waveform", "path": "/visual-waveform", "status": "ready", "description": "..." }
+  ]
+}
+```
+
+**Statuses:** `template` | `in-progress` | `ready` | `deprecated`
+
+The UI dropdowns only show items with `status: "ready"`.
+
+---
+
+## Creating Projects with Claude
+
+This is the command center for the lofi ecosystem. When creating new songs or visuals, start here.
+
+### Creating a New Song
+
+1. **User requests**: "Create a new song called [name]"
+2. **Claude creates** `~/lofi-[name]-song/` from `~/lofi-song-template/`
+3. **Claude registers** in `registry.json` with `status: "in-progress"`
+4. **Claude references** `~/lofi-development-docs/` for:
+   - Chord progressions and music theory
+   - Drum patterns and rhythm
+   - Tone.js instrument patterns
+   - Section structure and transitions
+5. **Claude implements** iteratively, testing with `demo.html`
+6. **When complete**, update registry status to `"ready"`
+7. **Load in lofi-dj** via dropdown for full integration testing
+
+### Creating a New Visual
+
+1. **User requests**: "Create a new visual called [name]"
+2. **Claude creates** `~/visual-[name]/` from `~/visual-template/`
+3. **Claude registers** in `registry.json` with `status: "in-progress"`
+4. **Claude references** `~/lofi-visuals-docs/` for:
+   - Audio-reactive techniques (frequency bands, smoothing)
+   - Canvas patterns and animation
+   - Lofi color palettes and aesthetics
+   - Section awareness
+5. **Claude implements** iteratively, testing with `demo.html`
+6. **When complete**, update registry status to `"ready"`
+7. **Load in lofi-dj** via dropdown for full integration testing
+
+### Templates
+
+| Type | Location | Use |
+|------|----------|-----|
+| Song | `~/lofi-song-template/` | Clone for new songs |
+| Visual | `~/visual-template/` | Clone for new visuals |
+
+Each template includes:
+- `index.js` - Implementation skeleton
+- `manifest.json` - Metadata
+- `demo.html` - Standalone test page
+- `README.md` - Instructions
+
+### Documentation References
+
+| Topic | Location |
+|-------|----------|
+| Tone.js basics | `~/lofi-development-docs/00-foundations/` |
+| Chord progressions | `~/lofi-development-docs/04-harmony/` |
+| Drum patterns | `~/lofi-development-docs/03-rhythm/` |
+| Song structure | `~/lofi-development-docs/06-arrangement/` |
+| Canvas basics | `~/lofi-visuals-docs/00-foundations/` |
+| Audio-reactive | `~/lofi-visuals-docs/01-audio-reactive/` |
+| Lofi aesthetics | `~/lofi-visuals-docs/02-lofi-aesthetics/` |
+| Visual recipes | `~/lofi-visuals-docs/03-recipes/` |
+
+---
+
 ## Interface Contracts
 
 ### Song Interface
@@ -143,48 +224,43 @@ class MyVisual {
 
 ---
 
-## Creating a New Song
+## Manual Creation (Alternative)
 
-1. **Create repo**: `mkdir ~/lofi-my-song && cd ~/lofi-my-song && git init`
-2. **Copy structure** from `~/lofi-demo-song/`:
-   ```
-   lofi-my-song/
-   ├── index.js        # Song class (default export)
-   └── manifest.json   # Metadata
-   ```
-3. **Implement Song interface** (see above)
-4. **Test**: Update `config.json` → `"song": "/lofi-my-song/index.js"`
-5. **Reference**: `~/lofi-development-docs/` for Tone.js patterns and lofi theory
+If creating projects manually (without Claude), use the templates:
 
-### Song Checklist
+### New Song
+```bash
+cp -r ~/lofi-song-template ~/lofi-my-song
+cd ~/lofi-my-song
+# Edit manifest.json, implement index.js, test with demo.html
+# Add to registry.json when ready
+```
+
+### New Visual
+```bash
+cp -r ~/visual-template ~/visual-my-visual
+cd ~/visual-my-visual
+# Edit manifest.json, implement index.js, test with demo.html
+# Add to registry.json when ready
+```
+
+### Checklists
+
+**Song:**
 - [ ] Exports default class implementing Song interface
 - [ ] `getState()` returns correct shape
 - [ ] `getMasterOutput()` returns Tone.js node
 - [ ] Emits `sectionChange` event when section changes
 - [ ] `dispose()` cleans up all Tone.js objects
+- [ ] Registered in `registry.json`
 
----
-
-## Creating a New Visual
-
-1. **Create repo**: `mkdir ~/visual-my-visual && cd ~/visual-my-visual && git init`
-2. **Copy structure** from `~/visual-template/`:
-   ```
-   visual-my-visual/
-   ├── index.js        # Visual class (default export)
-   ├── manifest.json   # Metadata
-   └── demo.html       # Standalone test (optional)
-   ```
-3. **Implement Visual interface** (see above)
-4. **Test**: Update `config.json` → `"visual": "/visual-my-visual/index.js"`
-5. **Reference**: `~/lofi-visuals-docs/` for Canvas patterns and audio-reactive techniques
-
-### Visual Checklist
+**Visual:**
 - [ ] Exports default class implementing Visual interface
 - [ ] `render()` accepts `(audioData, songState)`
 - [ ] Handles missing/empty audio data gracefully
 - [ ] `dispose()` cleans up canvas references
 - [ ] Responds to different sections (optional but recommended)
+- [ ] Registered in `registry.json`
 
 ---
 
@@ -192,8 +268,9 @@ class MyVisual {
 
 ```
 lofi-dj/
-├── index.html          # Main UI shell
+├── index.html          # Main UI shell with dropdowns
 ├── config.json         # Default song/visual, display settings
+├── registry.json       # Track all songs/visuals in ecosystem
 ├── styles.css          # UI styling
 ├── src/
 │   ├── controller.js   # DJController class - main orchestrator
