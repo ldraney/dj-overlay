@@ -221,10 +221,30 @@
         }
       }
 
-      // Auto-play if configured
-      if (config.defaults?.autoPlay && config.defaults?.song) {
-        await controller.play();
-        console.log('[DJ] Auto-play started');
+      // Check URL params for autoplay
+      const urlParams = new URLSearchParams(window.location.search);
+      const autoplayParam = urlParams.get('autoplay') === 'true';
+      const songParam = urlParams.get('song');
+
+      // If song specified in URL, load it
+      if (songParam) {
+        const songEntry = registry.songs.find(s => s.name === songParam && s.status === 'ready');
+        if (songEntry) {
+          const songPath = songEntry.path + '/index.js';
+          await controller.loadSong(songPath, 'A');
+          await loadSongMetadata(songPath);
+          selectSong.value = songPath;
+          console.log('[DJ] Loaded song from URL param:', songParam);
+        }
+      }
+
+      // Auto-play if configured or URL param
+      if ((config.defaults?.autoPlay && config.defaults?.song) || autoplayParam) {
+        // Small delay to ensure everything is loaded
+        setTimeout(async () => {
+          await controller.play();
+          console.log('[DJ] Auto-play started');
+        }, 500);
       }
     }
 
