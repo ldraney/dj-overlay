@@ -54,7 +54,7 @@
     {
       "name": "particles",
       "path": "/visual-particles",
-      "status": "ready",
+      "status": "deprecated",
       "created": "2025-01-04",
       "description": "Bass-triggered particle bursts with mid wind and high sparkles"
     },
