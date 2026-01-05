@@ -29,6 +29,13 @@
       "description": "Chill, mellow lofi for late-night study sessions"
     },
     {
+      "name": "sunset-drive",
+      "path": "/lofi-sunset-drive-song",
+      "status": "ready",
+      "created": "2026-01-04",
+      "description": "Nostalgic lofi for golden hour cruising - warm Rhodes chords, mellow bass, laid-back drums"
+    },
+    {
       "name": "template",
       "path": "/lofi-song-template",
       "status": "template",
@@ -57,6 +64,13 @@
       "status": "ready",
       "created": "2025-01-04",
       "description": "Rotating concentric polygons, section-aware complexity"
+    },
+    {
+      "name": "aurora",
+      "path": "/visual-aurora",
+      "status": "ready",
+      "created": "2026-01-04",
+      "description": "Aurora borealis with flowing ribbon bands, audio-reactive colors and sparkle effects"
     },
     {
       "name": "template",

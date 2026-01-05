@@ -96,6 +96,18 @@ export class DJController {
     console.log(`[DJController] Loading visual: ${visualPath}`);
 
     try {
+      // Remove any existing visual at this layer first
+      const existingIndex = this.visuals.findIndex(v => v._layer === layer);
+      if (existingIndex > -1) {
+        const existing = this.visuals[existingIndex];
+        if (existing._canvas) {
+          existing._canvas.remove();
+        }
+        existing.dispose?.();
+        this.visuals.splice(existingIndex, 1);
+        console.log(`[DJController] Removed existing visual at layer ${layer}`);
+      }
+
       const VisualModule = await import(visualPath);
       const VisualClass = VisualModule.default;
       const visual = new VisualClass();
