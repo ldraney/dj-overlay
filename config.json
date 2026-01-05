@@ -4,7 +4,7 @@
   },
   "defaults": {
     "song": "/lofi-demo-song/index.js",
-    "visual": "/visual-waveform/index.js",
+    "visual": "/visual-aurora/index.js",
     "autoPlay": false
   },
   "display": {
