@@ -7,11 +7,45 @@ The controller for the lofi music + visuals ecosystem. Manages song playback, vi
 ## Quick Start
 
 ```bash
-cd ~/lofi-dj
+cd ~/dj-overlay
 npm start
 # Server runs at http://localhost:3000
-# Open http://localhost:3000/lofi-dj/ in browser
+# Open http://localhost:3000/dj-overlay/ in browser
 ```
+
+## Streaming / OBS Setup
+
+Use as an **OBS Browser Source** for streaming:
+
+```
+http://localhost:3000/dj-overlay/?autoplay=true&song=rainy-night
+```
+
+**OBS Browser Source Settings:**
+- Width: `1920`
+- Height: `1080`
+- ✅ **Render transparency** (important!)
+
+**URL Parameters:**
+| Param | Example | Description |
+|-------|---------|-------------|
+| `autoplay` | `?autoplay=true` | Auto-start playback on load |
+| `song` | `?song=rainy-night` | Load specific song by name |
+
+The background is transparent - only the waveform and controls will show over your stream content.
+
+---
+
+## UI Features
+
+The interface includes:
+- **Song/Visual dropdowns** - Select from registry
+- **Play/Pause/Stop controls**
+- **Song metadata card** - Shows title, description, BPM, duration, current section, tags
+- **"Now Playing" indicator** - Pulsing green dot when playing
+- **Transparent sidebar** - Visual shows through with blur effect
+
+---
 
 ## Architecture
 
@@ -48,10 +82,13 @@ npm start
 
 ```
 ~/
-├── lofi-dj/                  # THIS REPO - Controller + Interface Contracts
+├── dj-overlay/               # THIS REPO - Controller + Interface Contracts
 ├── lofi-demo-song/           # Song implementation
+├── lofi-rainy-night-song/    # Chill study lofi
 ├── lofi-*-song/              # More songs...
-├── visual-waveform/          # Visual implementation
+├── visual-waveform/          # Waveform visualization
+├── visual-particles/         # Particle effects
+├── visual-geometric/         # Geometric shapes
 ├── visual-*/                 # More visuals...
 ├── lofi-development-docs/    # Deep Tone.js guides
 └── lofi-visuals-docs/        # Deep Canvas guides
@@ -68,7 +105,8 @@ All songs and visuals are tracked in `registry.json`:
 ```json
 {
   "songs": [
-    { "name": "demo-song", "path": "/lofi-demo-song", "status": "ready", "description": "..." }
+    { "name": "demo-song", "path": "/lofi-demo-song", "status": "ready", "description": "..." },
+    { "name": "rainy-night", "path": "/lofi-rainy-night-song", "status": "ready", "description": "..." }
   ],
   "visuals": [
     { "name": "waveform", "path": "/visual-waveform", "status": "ready", "description": "..." }
@@ -224,54 +262,14 @@ class MyVisual {
 
 ---
 
-## Manual Creation (Alternative)
-
-If creating projects manually (without Claude), use the templates:
-
-### New Song
-```bash
-cp -r ~/lofi-song-template ~/lofi-my-song
-cd ~/lofi-my-song
-# Edit manifest.json, implement index.js, test with demo.html
-# Add to registry.json when ready
-```
-
-### New Visual
-```bash
-cp -r ~/visual-template ~/visual-my-visual
-cd ~/visual-my-visual
-# Edit manifest.json, implement index.js, test with demo.html
-# Add to registry.json when ready
-```
-
-### Checklists
-
-**Song:**
-- [ ] Exports default class implementing Song interface
-- [ ] `getState()` returns correct shape
-- [ ] `getMasterOutput()` returns Tone.js node
-- [ ] Emits `sectionChange` event when section changes
-- [ ] `dispose()` cleans up all Tone.js objects
-- [ ] Registered in `registry.json`
-
-**Visual:**
-- [ ] Exports default class implementing Visual interface
-- [ ] `render()` accepts `(audioData, songState)`
-- [ ] Handles missing/empty audio data gracefully
-- [ ] `dispose()` cleans up canvas references
-- [ ] Responds to different sections (optional but recommended)
-- [ ] Registered in `registry.json`
-
----
-
 ## File Structure
 
 ```
-lofi-dj/
-├── index.html          # Main UI shell with dropdowns
+dj-overlay/
+├── index.html          # Main UI shell with dropdowns + song info card
 ├── config.json         # Default song/visual, display settings
 ├── registry.json       # Track all songs/visuals in ecosystem
-├── styles.css          # UI styling
+├── styles.css          # UI styling (transparent sidebar, metadata card)
 ├── src/
 │   ├── controller.js   # DJController class - main orchestrator
 │   ├── audio-chain.js  # Tone.js audio routing
@@ -349,7 +347,10 @@ bus.emit('eventName', data);
 npm start
 
 # Test in browser
-open http://localhost:3000/lofi-dj/
+open http://localhost:3000/dj-overlay/
+
+# Test with autoplay
+open http://localhost:3000/dj-overlay/?autoplay=true&song=rainy-night
 
 # Check console for logs:
 # [DJ] Config loaded
